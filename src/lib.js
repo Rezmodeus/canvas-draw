@@ -47,6 +47,23 @@ const sphere = (point, dimensions, texture) => {
 		getColor
 	};
 };
+const floor = (point, dimensions, texture) => {
+	const {zPos} = dimensions;
+
+	const intersect = ([px, py, pz]) => {
+		return pz<=zPos;
+	};
+	const getColor = ([px, py, pz]) => {
+		const f = ((Math.floor(px/10)+Math.floor(py/10))%2)*255;
+		const a = 255;
+		return [f, f, f, a];
+
+	};
+	return {
+		intersect,
+		getColor
+	};
+};
 
 const plane = (normal, point, dimensions, texture) => {
 	const [x, y, z] = point;
@@ -66,25 +83,23 @@ const render = (scene, rayVector,imageData,w=400) => {
 		for (let x = xSize; x > -xSize; x--) {
 			for (let z = zSize; z > 0; z--) {
 				const intesectedObj = scene.objects.find(obj => obj.intersect([x, y, z])) || null;
+				const nx = 50+(x+y);
+				const ny = 50+(y-x-z);
+				const pixelIndex = (ny * w + nx) * 4;
+				// console.log(nx, ny, color,pixelIndex );
 				if (intesectedObj) {
 					const color = intesectedObj.getColor([x, y, z]);
-					const nx = 50+(x+y);
-					const ny = 50+(y-x-z);
 
-					const pixelIndex = (ny * w + nx) * 4;
-					// console.log(nx, ny, color,pixelIndex );
-
-					// imageData[pixelIndex] = 255;
-					// imageData[pixelIndex+1] = 255;
-					// imageData[pixelIndex+2] = 255;
-					// imageData[pixelIndex+3] = 255;
-					// plot color
 					imageData[pixelIndex] = color[0];
 					imageData[pixelIndex+1] = color[1];
 					imageData[pixelIndex+2] = color[2];
 					imageData[pixelIndex+3] = color[3];
 				} else {
-					// console.log('none', x, y, z)
+					// plot empty
+					// imageData[pixelIndex] = 255;
+					// imageData[pixelIndex+1] = 255;
+					// imageData[pixelIndex+2] = 255;
+					// imageData[pixelIndex+3] = 255;
 				}
 
 			}
@@ -114,7 +129,9 @@ const test = (imageData) => {
 
 
 	const sp = sphere([10, 10, 10], {radius: 5}, null);
+	const fl = floor([],{zPos:2},null);
 	scene.objects.push(sp);
+	scene.objects.push(fl);
 	render(scene, null,imageData.data);
 };
 
