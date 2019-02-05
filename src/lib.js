@@ -28,16 +28,16 @@ const sphere = (point, dimensions, texture) => {
 	const [x, y, z] = point;
 	const {radius} = dimensions;
 
-	const intersect = (p) => {
-		const dx = p.x - x;
-		const dy = p.y - y;
-		const dz = p.z - z;
+	const intersect = ([px, py, pz]) => {
+		const dx = px - x;
+		const dy = py - y;
+		const dz = pz - z;
 		return Math.sqrt(dx * dx + dy * dy + dz * dz) < radius;
 	};
-	const getColor = (p) => {
-		const r = p.x & 255;
-		const g = p.y & 255;
-		const b = p.z & 255;
+	const getColor = ([px, py, pz]) => {
+		const r = (px*4) & 255;
+		const g = (py*4) & 255;
+		const b = (pz*4) & 255;
 		const a = 255;
 		return [r, g, b, a];
 
@@ -58,45 +58,65 @@ const plane = (normal, point, dimensions, texture) => {
 	return {intersect};
 };
 
-// scene
-//
-const scene = {
-	xSize: 50,
-	ySize: 50,
-	zSize: 50,
-	objects: []
-};
 
-scene.objects.push(sphere([15, 15, 15], {radius: 5}, null));
+const render = (scene, rayVector,imageData,w=400) => {
+	const {xSize, ySize, zSize} = scene;
+	const yMax = ySize + zSize;
+	for (let y = 0; y < yMax; y++) {
+		for (let x = xSize; x > -xSize; x--) {
+			for (let z = zSize; z > 0; z--) {
+				const intesectedObj = scene.objects.find(obj => obj.intersect([x, y, z])) || null;
+				if (intesectedObj) {
+					const color = intesectedObj.getColor([x, y, z]);
+					const nx = 50+(x+y);
+					const ny = 50+(y-x-z);
 
+					const pixelIndex = (ny * w + nx) * 4;
+					// console.log(nx, ny, color,pixelIndex );
 
-const render = (scene, rayVector) => {
-		const {xSize, ySize, zSize} = scene;
-		const yMax = ySize + zSize;
-
-		for (let y = 0; y++; y < yMax) {
-			for (let x = xSize; x--; x > -xSize) {
-				for (let z = zSize; z--; z > 0) {
-					const intesectedObj = scene.objects.find(obj => obj.intersect([x, y, z])) || null;
-					if (intesectedObj) {
-						const color = intesectedObj.getColor([x, y, z]);
-					}
-
+					// imageData[pixelIndex] = 255;
+					// imageData[pixelIndex+1] = 255;
+					// imageData[pixelIndex+2] = 255;
+					// imageData[pixelIndex+3] = 255;
+					// plot color
+					imageData[pixelIndex] = color[0];
+					imageData[pixelIndex+1] = color[1];
+					imageData[pixelIndex+2] = color[2];
+					imageData[pixelIndex+3] = color[3];
+				} else {
+					// console.log('none', x, y, z)
 				}
+
 			}
 		}
-
-
-		// loop with y from 0 to yMax
-		//   loop x from xSize to -zSize
-		//     loop z from zSize to 0
-		//       intersectedObject = scene.objects.find(o=>o.intersect(x,y,z)) || null
-		//       if intersectedObject
-		//         store intersectedObject.getColor([x,y,z])
-		//         break
-
 	}
-;
+
+
+	// loop with y from 0 to yMax
+	//   loop x from xSize to -zSize
+	//     loop z from zSize to 0
+	//       intersectedObject = scene.objects.find(o=>o.intersect(x,y,z)) || null
+	//       if intersectedObject
+	//         store intersectedObject.getColor([x,y,z])
+	//         break
+
+};
+const test = (imageData) => {
+
+// scene
+//
+	const scene = {
+		xSize: 20,
+		ySize: 20,
+		zSize: 20,
+		objects: []
+	};
+
+
+	const sp = sphere([10, 10, 10], {radius: 5}, null);
+	scene.objects.push(sp);
+	render(scene, null,imageData.data);
+};
 
 
 // define a surface
@@ -164,5 +184,6 @@ const subtractShape = () => {
 
 export default {
 	isoSort,
-	objToPoints
+	objToPoints,
+	test
 }

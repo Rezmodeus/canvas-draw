@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import lib from './lib'
 import './App.css';
 
 class App extends Component {
@@ -8,7 +9,8 @@ class App extends Component {
 		// Don't call this.setState() here!
 		this.state = {
 			height: 400,
-			width: 400
+			width: 400,
+			counter: 0,
 		}
 		;
 		this.setPixel = this.setPixel.bind(this);
@@ -22,6 +24,7 @@ class App extends Component {
 
 	updateImage() {
 		this.ctx.putImageData(this.imagedata, 0, 0);
+		// this.setState({counter: this.state.counter + 1});
 	};
 
 	drawRect(x0, y0, x1, y1) {
@@ -30,15 +33,17 @@ class App extends Component {
 				this.setPixel(x, y);
 			}
 		}
+		lib.test(this.imagedata);
+		console.log(this.imagedata)
 		this.updateImage();
 
 	}
 
 	setPixel(x, y) {
 		const pixelindex = (y * this.state.width + x) * 4;
-		this.imagedata.data[pixelindex] = 255;//red;
-		this.imagedata.data[pixelindex + 1] = 255;//green;
-		this.imagedata.data[pixelindex + 2] = 255;//blue;
+		this.imagedata.data[pixelindex] = 100;//red;
+		this.imagedata.data[pixelindex + 1] = 0;//green;
+		this.imagedata.data[pixelindex + 2] = 0;//blue;
 		this.imagedata.data[pixelindex + 3] = 255;//alpha;
 	}
 
@@ -52,7 +57,7 @@ class App extends Component {
 		return (
 			<div className="App">
 				<header className="App-header">
-					<button onClick={() => this.drawRect(100, 100, 200, 200)}>
+					<button onClick={() => this.drawRect(0, 0, 100, 100)}>
 						set pix
 					</button>
 					<canvas className="canvas-container" style={canvasStyle}
