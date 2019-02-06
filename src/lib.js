@@ -151,6 +151,15 @@ const box = (point, dimensions, texture) => {
 	};
 };
 
+// IDEA axonometric projection by object
+// project all surfaces to the camera, by object
+
+
+// IDEA
+// for each x,y   not z
+// get all distances
+// use the closest one
+
 
 const render = (scene, rayVector, imageData, w = 400) => {
 	const {xSize, ySize, zSize} = scene;
@@ -194,8 +203,11 @@ const test = (imageData) => {
 
 	const sp = sphere([30, 20, 10], {radius: 10}, null);
 	const fl = floor([], {zPos: 2}, null);
+	// top
 	const xbox = box([10, 20, 10], {xMax: 10, yMax: 1, zMax: 10}, null);
+	// side
 	const ybox = box([20, 30, 10], {xMax: 1, yMax: 10, zMax: 10}, null);
+	// front
 	const zbox = box([30, 40, 10], {xMax: 10, yMax: 10, zMax: 1}, null);
 
 	const b = box([20, 40, 10], {xMax: 10, yMax: 10, zMax: 10}, null);

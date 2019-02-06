@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import lib from './lib'
+import testLib from './testLib'
 import './App.css';
 
 class App extends Component {
@@ -30,11 +31,12 @@ class App extends Component {
 	drawRect(x0, y0, x1, y1) {
 		for (let x = x0; x < x1; x++) {
 			for (let y = y0; y < y1; y++) {
-				this.setPixel(x, y);
+				// this.setPixel(x, y);
 			}
 		}
-		lib.test(this.imagedata);
-		this.updateImage();
+		testLib.testDraw(this.ctx);
+		// lib.test(this.imagedata);
+		// this.updateImage();
 
 	}
 
