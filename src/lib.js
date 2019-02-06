@@ -185,8 +185,8 @@ const test = (imageData) => {
 // scene
 //
 	const scene = {
-		xSize: 50,
-		ySize: 50,
+		xSize: 100,
+		ySize: 100,
 		zSize: 20,
 		objects: []
 	};
@@ -194,11 +194,21 @@ const test = (imageData) => {
 
 	const sp = sphere([30, 20, 10], {radius: 10}, null);
 	const fl = floor([], {zPos: 2}, null);
+	const xbox = box([10, 20, 10], {xMax: 10, yMax: 1, zMax: 10}, null);
+	const ybox = box([20, 30, 10], {xMax: 1, yMax: 10, zMax: 10}, null);
+	const zbox = box([30, 40, 10], {xMax: 10, yMax: 10, zMax: 1}, null);
+
 	const b = box([20, 40, 10], {xMax: 10, yMax: 10, zMax: 10}, null);
-	scene.objects.push(sp);
-	// scene.objects.push(fl);
-	scene.objects.push(b);
+	// scene.objects.push(sp);
+	scene.objects.push(fl);
+	// scene.objects.push(b);
+	scene.objects.push(xbox);
+	scene.objects.push(ybox);
+	scene.objects.push(zbox);
+	const t0 = new Date().getTime();
 	render(scene, [1, -1, -1], imageData.data);
+	const t1 = new Date().getTime();
+	console.log('render time', (t1 - t0), 'ms');
 };
 
 export default {
