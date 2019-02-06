@@ -34,7 +34,6 @@ class App extends Component {
 			}
 		}
 		lib.test(this.imagedata);
-		console.log(this.imagedata)
 		this.updateImage();
 
 	}
@@ -50,14 +49,14 @@ class App extends Component {
 
 	render() {
 		const canvasStyle = {
-			height: this.state.height + 'px',
-			width: this.state.width + 'px',
+			// height: this.state.height + 'px',
+			// width: this.state.width + 'px',
 		};
 
 		return (
 			<div className="App">
 				<header className="App-header">
-					<button onClick={() => this.drawRect(0, 0, 100, 100)}>
+					<button onClick={() => this.drawRect(10, 10, 100, 100)}>
 						set pix
 					</button>
 					<canvas className="canvas-container" style={canvasStyle}
