@@ -223,6 +223,46 @@ const test = (imageData) => {
 	console.log('render time', (t1 - t0), 'ms');
 };
 
+// direction front,side,top
+const plane = (point, direction, size, texture) => {
+	const [x, y, z] = point;
+	const {width, height} = size;
+	const widthAdd = [1, 0, 0];
+	const heightAdd = [0, 1, 0];
+
+	const render = (projection, depthMap, colorDict) => {
+		for (let h = 0; h < height; h++) {
+			let point = [x, y, z];
+			const heightOffset = math.multiply(heightAdd, h);
+			point = math.add(heightOffset, point);
+			for (let w = 0; w < width; w++) {
+				const widthOffset = math.multiply(widthAdd, w);
+				point = math.add(widthOffset, point);
+				// project point to depthMap projection to get dx,dy
+				// get distance between point and dx,dy
+				// if(distance < depthMap[dx,dy].depth)
+				//   get color from texture
+				//   get colorIndex from colorDict[color] or create new index
+				//   depthMap[dx,dy].depth = distance
+				//   depthMap[dx,dy].colorIndex = colorIndex
+
+				// move to next point to fill holes
+				// point = math.add(widthAdd, point);
+				// if(distance < depthMap[dx,dy].depth)
+				//   get color from texture
+				//   get colorIndex from colorDict[color] or create new index
+				//   depthMap[dx,dy].depth = distance
+				//   depthMap[dx,dy].colorIndex = colorIndex
+
+				//
+			}
+		}
+
+	}
+
+};
+
+
 export default {
 	test
 }

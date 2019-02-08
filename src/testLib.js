@@ -138,7 +138,12 @@ const testDraw = (ctx) => {
 				});
 
 				// create a new array of 2D projected verts
-				const projVerts = translated.map(vert => axoProjMat.project(vert));
+				const projVerts = translated.map(vert => axoProjMat.project(vert))
+				// floor x,y,z
+					.map(v => {
+						return {x: v.x | 0, y: v.y | 0, z: v.z | 0}
+					});
+				console.log(projVerts);
 				// and render
 				polygons.forEach(poly => {
 					ctx.fillStyle = poly.colour;
