@@ -34,9 +34,9 @@ class App extends Component {
 				// this.setPixel(x, y);
 			}
 		}
-		testLib.testDraw(this.ctx);
-		// lib.test(this.imagedata);
-		// this.updateImage();
+		// testLib.testDraw(this.ctx);
+		lib.test(this.imagedata);
+		this.updateImage();
 
 	}
 

@@ -223,46 +223,154 @@ const test = (imageData) => {
 	console.log('render time', (t1 - t0), 'ms');
 };
 
-// direction front,side,top
-const plane = (point, direction, size, texture) => {
+// create a plane top, side or front
+const plane = (point, size, color) => {
 	const [x, y, z] = point;
 	const {width, height} = size;
-	const widthAdd = [1, 0, 0];
-	const heightAdd = [0, 1, 0];
+	const widthVector = [1, 0, 0];
+	const heightVector = [0, 0, 1];
 
-	const render = (projection, depthMap, colorDict) => {
+	const _projectIso = ([x, y, z]) => {
+		return [Math.floor(x - y), Math.floor((x / 2) + (y / 2) - z)];
+	};
+
+
+	const projectIso = ([x, y, z]) => {
+		return [x+y,y-x-z];
+	};
+
+
+	// isoMap[y][x]
+	// entry
+	//   [z,[r,g,b,a]]
+
+
+	const render = (isoMap) => {
 		for (let h = 0; h < height; h++) {
 			let point = [x, y, z];
-			const heightOffset = math.multiply(heightAdd, h);
+			// go to right pos along height
+			const heightOffset = math.multiply(heightVector, h);
 			point = math.add(heightOffset, point);
 			for (let w = 0; w < width; w++) {
-				const widthOffset = math.multiply(widthAdd, w);
-				point = math.add(widthOffset, point);
-				// project point to depthMap projection to get dx,dy
+				// go to right pos along width
+				// const widthOffset = math.multiply(widthVector, w);
+				point = math.add(widthVector, point);
+
+				// get image x,y
+				const isoXY = projectIso(point);
+				const isoEntry = isoMap[isoXY[1]][isoXY[0]];
+				console.log(point, isoXY,isoEntry, heightOffset,widthVector);
+				if (point[2] > isoEntry[0]) {
+					console.log('SET');
+					// point is closer than isoEntry, overwrite
+					isoEntry[0] = point[2];
+					isoEntry[1] = color;
+				}
+
+
+				// isoMap.z value use distance to z==0
+				// higher values = closer to view port
+				// p2 = point.z * projection
+				// dist = Math.sqrt(p,p2)
+
+				// calculate x,y using projection
+				// higher z than saved value => overwrite
+				// or just use z
+
+
+				// project point to isoMap projection to get dx,dy
 				// get distance between point and dx,dy
-				// if(distance < depthMap[dx,dy].depth)
+				// if(distance < isoMap[dx,dy].depth)
 				//   get color from texture
 				//   get colorIndex from colorDict[color] or create new index
-				//   depthMap[dx,dy].depth = distance
-				//   depthMap[dx,dy].colorIndex = colorIndex
+				//   isoMap[dx,dy].depth = distance
+				//   isoMap[dx,dy].colorIndex = colorIndex
 
 				// move to next point to fill holes
-				// point = math.add(widthAdd, point);
-				// if(distance < depthMap[dx,dy].depth)
+				// point = math.add(widthVector, point);
+				// if(distance < isoMap[dx,dy].depth)
 				//   get color from texture
 				//   get colorIndex from colorDict[color] or create new index
-				//   depthMap[dx,dy].depth = distance
-				//   depthMap[dx,dy].colorIndex = colorIndex
+				//   isoMap[dx,dy].depth = distance
+				//   isoMap[dx,dy].colorIndex = colorIndex
 
 				//
 			}
 		}
 
+	};
+	return {
+		render
 	}
 
 };
 
+const getIsoMap = (width, height) => {
+	const repeat = (fn, n) => Array(n).fill(0).map(fn);
+	const onePos = () => [-1, [50, 50, 50, 255]];
+	const isoMap = (w, h) => repeat(() => repeat(onePos, w), h);
+	return isoMap(width, height);
+};
+
+const drawIsoMap = (isoMap, imageData, w, h) => {
+	isoMap.forEach((row, y) => {
+		row.forEach((isoPos, x) => {
+			const color = isoPos[1];
+			const pixelIndex = (y * w + x) * 4;
+			imageData.data[pixelIndex] = color[0];
+			imageData.data[pixelIndex + 1] = color[1];
+			imageData.data[pixelIndex + 2] = color[2];
+			imageData.data[pixelIndex + 3] = color[3];
+		})
+	})
+};
+
+
+const test2 = (imageData) => {
+	const isoMap = getIsoMap(50, 50);
+
+	const p0 = plane([5, 25, 5], {width: 8, height: 7},[255, 0, 0, 255]);
+	const p1 = plane([0, 25, 5], {width: 8, height: 5},[0, 0, 255, 255]);
+	p0.render(isoMap);
+	p1.render(isoMap);
+	drawIsoMap(isoMap, imageData, 400, 400);
+	console.log('drewww')
+
+};
+
+
+// from stack overflow
+// function projectIso(x, y, z) {
+// 	return {
+// 		x: x - y,
+// 		y: (x / 2) + (y / 2) - z
+// 	};
+// }
+
+// pigeon hole sort
+// sort(entities)
+// 	buckets = new Array(MaxDistance)
+//
+// 	for index in buckets
+// 		buckets[index] = new Array
+// 	end
+//
+// 	// distribute to buckets
+// 	for entity in entities
+// 		distance = calculateDistance(entity)
+// 	buckets[distance].add(entity)
+// 	end
+//
+// 	// flatten
+// 	result = new Array
+// 	for bucket in buckets
+// 		for entity in bucket
+// 			result.add(entity)
+// 		end
+// 	end
+// end
+
 
 export default {
-	test
+	test: test2
 }
