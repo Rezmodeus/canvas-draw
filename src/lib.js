@@ -230,20 +230,43 @@ const plane = (point, size, color) => {
 	const widthVector = [1, 0, 0];
 	const heightVector = [0, 0, 1];
 
+	// const _projectIso = ([x, y, z]) => {
+	// 	return [Math.floor(x - y), Math.floor((x / 2) + (y / 2) - z)];
+	// };
+
+
 	const _projectIso = ([x, y, z]) => {
-		return [Math.floor(x - y), Math.floor((x / 2) + (y / 2) - z)];
+		return [x + y, y - x - z];
 	};
 
 
-	const projectIso = ([x, y, z]) => {
-		return [x+y,y-x-z];
+	const projectIso = ([x, y, z], w, h) => {
+		return [x + y, y - x - z, (w - x) + (z * h)];
 	};
 
 
-	// isoMap[y][x]
-	// entry
-	//   [z,[r,g,b,a]]
+	const renderSetup = (isoMap, projectIso, getDepth) => {
 
+		const addIsoPoint = (point, color) => {
+			const isoPoint = projectIso(point);
+			const depth = getDepth(point);
+			const inBounds = isoPoint[0] >= 0 &&
+				isoPoint[0] < isoMap[0].length &&
+				isoPoint[1] >= 0 &&
+				isoPoint[1] < isoMap.length;
+			// isoItem = depth,z,color/colorIndex
+			const prevIsoItem = inBounds
+				? isoMap[isoPoint[1]][isoPoint[0]]
+				: [0, 0, [0, 0, 0, 0]];
+			// check depth
+			if (depth > prevIsoItem[0]) {
+				isoMap[isoPoint[1]][isoPoint[0]] = [depth, point[2], color];
+			}
+		};
+		return {
+			addIsoPoint
+		}
+	};
 
 	const render = (isoMap) => {
 		for (let h = 0; h < height; h++) {
@@ -256,12 +279,17 @@ const plane = (point, size, color) => {
 				// const widthOffset = math.multiply(widthVector, w);
 				point = math.add(widthVector, point);
 
+				// TODO
+				// make projectIso a parameter, for different projections
+				// projectIso should calc depth = z*w+(w-x)
+				// check bounds for isoMap before using,setting
+				// can't use depth for tracing edges!!
+				// isoItem = x,y,z,depth,color/colorIndex
+
 				// get image x,y
 				const isoXY = projectIso(point);
 				const isoEntry = isoMap[isoXY[1]][isoXY[0]];
-				console.log(point, isoXY,isoEntry, heightOffset,widthVector);
 				if (point[2] > isoEntry[0]) {
-					console.log('SET');
 					// point is closer than isoEntry, overwrite
 					isoEntry[0] = point[2];
 					isoEntry[1] = color;
@@ -329,8 +357,8 @@ const drawIsoMap = (isoMap, imageData, w, h) => {
 const test2 = (imageData) => {
 	const isoMap = getIsoMap(50, 50);
 
-	const p0 = plane([5, 25, 5], {width: 8, height: 7},[255, 0, 0, 255]);
-	const p1 = plane([0, 25, 5], {width: 8, height: 5},[0, 0, 255, 255]);
+	const p0 = plane([5, 25, 5], {width: 8, height: 7}, [255, 0, 0, 255]);
+	const p1 = plane([0, 25, 5], {width: 8, height: 5}, [0, 0, 255, 255]);
 	p0.render(isoMap);
 	p1.render(isoMap);
 	drawIsoMap(isoMap, imageData, 400, 400);
