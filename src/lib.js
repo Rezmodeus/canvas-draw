@@ -109,8 +109,11 @@ const plane = (point, size, color) => {
 const newRenderSetup = (isoMap, projectionType = 'iso1') => {
 
 	// TODO: select projection function and depth function based on projectionType
-	const projectIso = () => 0;
-	const getDepth = () => 0;
+	const projectIso = ([x, y, z]) => {
+		return [x + y, y - x - z];
+	};
+
+	const getDepth = ([x, y, z]) => y + z;
 
 	const willRender = (point) => {
 		const isoPoint = projectIso(point);
@@ -129,7 +132,7 @@ const newRenderSetup = (isoMap, projectionType = 'iso1') => {
 	const addToMap = (point, color) => {
 		const prevIsoItem = getIsoItem(point);
 		const depth = getDepth(point);
-		if (prevIsoItem && depth > prevIsoItem[0]) {
+		if (prevIsoItem && depth >= prevIsoItem[0]) {
 			const item = [depth, point[2], color];
 			setIsoItem(point, item);
 		}
@@ -162,7 +165,8 @@ const newRenderSetup = (isoMap, projectionType = 'iso1') => {
 
 const newIsoMap = (width, height) => {
 	const repeat = (fn, n) => Array(n).fill(0).map(fn);
-	const onePos = () => [-1, [50, 50, 50, 255]];
+	// isoItem = depth,z,color/colorIndex
+	const onePos = () => [-1, 0, [50, 50, 50, 255]];
 	const isoMap = (w, h) => repeat(() => repeat(onePos, w), h);
 	return isoMap(width, height);
 };
@@ -170,7 +174,7 @@ const newIsoMap = (width, height) => {
 const isoMapToImage = (isoMap, imageData, w, h) => {
 	isoMap.forEach((row, y) => {
 		row.forEach((isoPos, x) => {
-			const color = isoPos[1];
+			const color = isoPos[2];
 			const pixelIndex = (y * w + x) * 4;
 			imageData.data[pixelIndex] = color[0];
 			imageData.data[pixelIndex + 1] = color[1];
@@ -194,7 +198,8 @@ const test = (imageData) => {
 
 	// create objects
 	const p0 = plane([5, 25, 5], {width: 8, height: 7}, [255, 0, 0, 255]);
-	const p1 = plane([0, 25, 5], {width: 8, height: 5}, [0, 0, 255, 255]);
+	const p1 = plane([5, 26, 5], {width: 8, height: 7}, [0, 255, 0, 255]);
+	const p2 = plane([5, 27, 5], {width: 8, height: 7}, [0, 0, 255, 255]);
 
 
 	// render setup
@@ -202,7 +207,7 @@ const test = (imageData) => {
 	const renderSetup = newRenderSetup(isoMap, projectionType);
 
 	// render isoMap
-	const objectsToRender = [p0, p1];
+	const objectsToRender = [p0, p1, p2];
 	objectsToRender.forEach(obj => obj.render(renderSetup));
 
 	// isoMap to image
