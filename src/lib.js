@@ -171,7 +171,9 @@ const newIsoMap = (width, height) => {
 	return isoMap(width, height);
 };
 
-const isoMapToImage = (isoMap, imageData, w, h) => {
+const isoMapToImage = (isoMap, imageData) => {
+	const w = imageData.width;
+	const h = imageData.height;
 	isoMap.forEach((row, y) => {
 		row.forEach((isoPos, x) => {
 			const color = isoPos[2];
@@ -187,19 +189,12 @@ const isoMapToImage = (isoMap, imageData, w, h) => {
 
 const test = (imageData) => {
 
-	const scene = {
-		xSize: 100,
-		ySize: 100,
-		zSize: 20,
-		objects: []
-	};
-
-	const isoMap = newIsoMap(50, 50);
+	const isoMap = newIsoMap(imageData.width, imageData.height);
 
 	// create objects
 	const p0 = plane([5, 25, 5], {width: 8, height: 7}, [255, 0, 0, 255]);
-	const p1 = plane([5, 26, 5], {width: 8, height: 7}, [0, 255, 0, 255]);
-	const p2 = plane([5, 27, 5], {width: 8, height: 7}, [0, 0, 255, 255]);
+	const p1 = plane([5, 26, 5], {width: 8, height: 8}, [0, 255, 0, 255]);
+	const p2 = plane([5, 27, 5], {width: 8, height: 9}, [0, 0, 255, 255]);
 
 
 	// render setup
@@ -211,7 +206,7 @@ const test = (imageData) => {
 	objectsToRender.forEach(obj => obj.render(renderSetup));
 
 	// isoMap to image
-	isoMapToImage(isoMap, imageData, 400, 400);
+	isoMapToImage(isoMap, imageData);
 
 };
 

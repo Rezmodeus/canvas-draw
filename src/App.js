@@ -9,8 +9,8 @@ class App extends Component {
 		super(props);
 		// Don't call this.setState() here!
 		this.state = {
-			height: 400,
-			width: 400,
+			height: 200,
+			width: 200,
 			counter: 0,
 		}
 		;
@@ -51,8 +51,8 @@ class App extends Component {
 
 	render() {
 		const canvasStyle = {
-			// height: this.state.height + 'px',
-			// width: this.state.width + 'px',
+			height: '800px',
+			width: '800px',
 		};
 
 		return (
@@ -61,7 +61,8 @@ class App extends Component {
 					<button onClick={() => this.drawRect(10, 10, 100, 100)}>
 						set pix
 					</button>
-					<canvas className="canvas-container" style={canvasStyle}
+					<canvas width={this.state.width} height={this.state.height} className="canvas-container"
+					        style={canvasStyle}
 					        ref={(c) => this.ctx = c.getContext('2d')}/>
 				</header>
 			</div>
