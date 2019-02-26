@@ -70,17 +70,34 @@ const insideRect = function ([x, y, z], [x0, y0, z0, x1, y1, z1]) {
 // ***************************************************
 
 
+const direction = {
+	front: {
+		widthVector: [1, 0, 0],
+		heightVector: [0, 0, 1]
+	},
+	top: {
+		widthVector: [1, 0, 0],
+		heightVector: [0, 1, 0]
+	},
+	side: {
+		widthVector: [0, 1, 0],
+		heightVector: [0, 0, 1]
+	}
+};
+
+
 // Main idea here
 // project all surfaces to the camera, by object
 // use a depth parameter to decide if overwrite point
 
 // create a plane top, side or front
 // TODO: use shader instead of just color
-const plane = (point, size, color) => {
+const plane = (point, size, color, {widthVector, heightVector}) => {
 	const [x, y, z] = point;
 	const {width, height} = size;
-	const widthVector = [1, 0, 0];
-	const heightVector = [0, 0, 1];
+// TODO: use direction here
+// 	const widthVector = [1, 0, 0];
+// 	const heightVector = [0, 0, 1];
 
 	const render = (renderSetup) => {
 		for (let h = 0; h < height; h++) {
@@ -173,7 +190,6 @@ const newIsoMap = (width, height) => {
 
 const isoMapToImage = (isoMap, imageData) => {
 	const w = imageData.width;
-	const h = imageData.height;
 	isoMap.forEach((row, y) => {
 		row.forEach((isoPos, x) => {
 			const color = isoPos[2];
@@ -186,15 +202,29 @@ const isoMapToImage = (isoMap, imageData) => {
 	})
 };
 
+// TODO:
+// higher end functions using plane
+// top
+// front
+// side
+
+// even higher
+// box
+// frustum
+
+// hole shader
+// extrude
+// circles
+
 
 const test = (imageData) => {
 
 	const isoMap = newIsoMap(imageData.width, imageData.height);
 
 	// create objects
-	const p0 = plane([5, 25, 5], {width: 8, height: 7}, [255, 0, 0, 255]);
-	const p1 = plane([5, 26, 5], {width: 8, height: 8}, [0, 255, 0, 255]);
-	const p2 = plane([5, 27, 5], {width: 8, height: 9}, [0, 0, 255, 255]);
+	const p0 = plane([5, 25, 5], {width: 8, height: 7}, [255, 0, 0, 255], direction.front);
+	const p1 = plane([5, 26, 5], {width: 8, height: 8}, [0, 255, 0, 255], direction.side);
+	const p2 = plane([5, 27, 5], {width: 8, height: 9}, [0, 0, 255, 255], direction.top);
 
 
 	// render setup
@@ -203,6 +233,7 @@ const test = (imageData) => {
 
 	// render isoMap
 	const objectsToRender = [p0, p1, p2];
+	// const objectsToRender = [p0];
 	objectsToRender.forEach(obj => obj.render(renderSetup));
 
 	// isoMap to image
