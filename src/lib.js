@@ -95,10 +95,6 @@ const direction = {
 const plane = (point, size, color, {widthVector, heightVector}) => {
 	const [x, y, z] = point;
 	const {width, height} = size;
-// TODO: use direction here
-// 	const widthVector = [1, 0, 0];
-// 	const heightVector = [0, 0, 1];
-
 	const render = (renderSetup) => {
 		for (let h = 0; h < height; h++) {
 			let point = [x, y, z];
@@ -111,12 +107,10 @@ const plane = (point, size, color, {widthVector, heightVector}) => {
 				renderSetup.addToMap(point, color)
 			}
 		}
-
 	};
 	return {
 		render
 	}
-
 };
 
 
@@ -146,7 +140,9 @@ const newRenderSetup = (isoMap, projectionType = 'iso1') => {
 		return (depth > prevDepth);
 	};
 
-	const addToMap = (point, color) => {
+	const pointToIntPoint = ([x, y, z]) => [x | 0, y | 0, z | 0];
+	const addToMap = (p, color) => {
+		const point = pointToIntPoint(p);
 		const prevIsoItem = getIsoItem(point);
 		const depth = getDepth(point);
 		if (prevIsoItem && depth >= prevIsoItem[0]) {
@@ -224,7 +220,7 @@ const test = (imageData) => {
 	// create objects
 	const p0 = plane([5, 25, 5], {width: 8, height: 7}, [255, 0, 0, 255], direction.front);
 	const p1 = plane([5, 26, 5], {width: 8, height: 8}, [0, 255, 0, 255], direction.side);
-	const p2 = plane([5, 27, 5], {width: 8, height: 9}, [0, 0, 255, 255], direction.top);
+	const p2 = plane([5, 27, 5], {width: 10, height: 10}, [0, 0, 255, 255], direction.top);
 
 
 	// render setup
